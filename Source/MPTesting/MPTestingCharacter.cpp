@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMPTestingCharacter
@@ -75,6 +76,29 @@ void AMPTestingCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	// handle touch devices
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AMPTestingCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AMPTestingCharacter::TouchStopped);
+}
+
+void AMPTestingCharacter::OpenLobby()
+{
+	UWorld* world = GetWorld();
+	if (world)
+	{
+		world->ServerTravel("/Game/ThirdPerson/Maps/Lobby?listen");
+	}
+}
+
+void AMPTestingCharacter::CallOpenLevel(const FString& Address)
+{
+	UGameplayStatics::OpenLevel(this, *Address);
+}
+
+void AMPTestingCharacter::CallClientTravel(const FString& Address)
+{
+	APlayerController* playerController = GetGameInstance()->GetFirstLocalPlayerController();
+	if (playerController)
+	{
+		playerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+	}
 }
 
 void AMPTestingCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
